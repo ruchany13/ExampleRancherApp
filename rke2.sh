@@ -6,12 +6,21 @@ exec 3>&1 4>&2
 exec 1> >(tee -a log.out >&3)
 exec 2> >(tee -a error.out >&4)
 
+CONFIG_FILE="rke2.conf"
+
+# Check configuration for Installation
+if [ -f "$CONFIG_FILE" ]; then
+    source "$CONFIG_FILE"
+
+else
+    echo "ERROR: $CONFIG_FILE not found."
+    exit 1
+fi
+
+INSTALL_RKE2_CHANNEL=${INSTALL_RKE2_CHANNEL:-stable}
+INSTALL_RKE2_VERSION=${INSTALL_RKE2_VERSION:-latest}
+
 echo -e "\n# ----- RKE2 Cluster Installation Script -----#"
-
-read -p "Enter RKE2 Version (e.g., v1.34.1+rke2r1): " INSTALL_RKE2_VERSION
-read -p "Enter RKE2 Type (server/agent): " INSTALL_RKE2_TYPE
-read -p "Enter RKE2 Channel (stable/latest): " INSTALL_RKE2_CHANNEL
-
 echo -e "\nRKE2 will be installed with the following parameters:"
 echo -e "\nInstalling RKE2 version: $INSTALL_RKE2_VERSION"
 echo -e "\nRKE2 Channel: $INSTALL_RKE2_CHANNEL"
@@ -20,7 +29,13 @@ read -p "Press Enter to continue or Ctrl+C to abort..."
 
 
 # Download and install RKE2
+
+if ["$INSTALL_RKE2_VERSION" == "latest"]; then
+    curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
+fi
+
 curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="$INSTALL_RKE2_VERSION" INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
+
 sudo systemctl enable rke2-server.service  
 echo -e "\nStarting RKE2 $INSTALL_RKE2_TYPE service..."  
 
@@ -28,8 +43,6 @@ if [ "$INSTALL_RKE2_TYPE" == "agent" ]; then
     sudo systemctl enable rke2-agent.service  
     sudo mkdir -p /etc/rancher/rke2/
     
-    read -p "Enter the RKE2 server URL (e.g., https://<server-ip>:9345): " RKE2_SERVER_URL
-    read -p "Enter the RKE2 token: " RKE2_TOKEN
     echo -e "\nserver: $RKE2_SERVER_URL" | sudo tee /etc/rancher/rke2/config.yaml
     echo -e "\ntoken: $RKE2_TOKEN" | sudo tee -a /etc/rancher/rke2/config.yaml
 
