@@ -81,14 +81,14 @@ if [ "$SSL_CONFIG" == "self-signed" ]; then
             --devel \
             --namespace $NAMESPACE \
             --set hostname=$HOSTNAME \
-            --set bootstrapPassword=$PASSWORD \
+            --set bootstrapPassword="$PASSWORD" \
             --version=$RANCHER_VERSION
             
     else
         helm install rancher rancher-$CHART_REPO_NAME/rancher \
             --namespace $NAMESPACE \
             --set hostname=$HOSTNAME \
-            --set bootstrapPassword=$PASSWORD \
+            --set bootstrapPassword="$PASSWORD" \
             --version=$RANCHER_VERSION
     fi
 
@@ -103,7 +103,7 @@ elif [ "$SSL_CONFIG" == "lets-encrypt" ]; then
             --devel \
             --namespace $NAMESPACE \
             --set hostname=$HOSTNAME \
-            --set bootstrapPassword=$PASSWORD \
+            --set bootstrapPassword="$PASSWORD" \
             --set ingress.tls.source=letsEncrypt \
             --set letsEncrypt.email=$SSL_MAIL \
             --set letsEncrypt.ingress.class=$INGRESS_CLASS \
@@ -113,7 +113,7 @@ elif [ "$SSL_CONFIG" == "lets-encrypt" ]; then
         helm install rancher rancher-$CHART_REPO_NAME/rancher \
             --namespace $NAMESPACE \
             --set hostname=$HOSTNAME \
-            --set bootstrapPassword=$PASSWORD \
+            --set bootstrapPassword=""$PASSWORD"" \
             --set ingress.tls.source=letsEncrypt \
             --set letsEncrypt.email=$SSL_MAIL \
             --set letsEncrypt.ingress.class=$INGRESS_CLASS \
@@ -135,7 +135,7 @@ elif [ "$SSL_CONFIG" == "custom" ]; then
             helm install rancher rancher-$CHART_REPO_NAME/rancher \
                 --namespace $NAMESPACE \
                 --set hostname=$HOSTNAME \
-                --set bootstrapPassword=$PASSWORD \
+                --set bootstrapPassword="$PASSWORD" \
                 --set ingress.tls.source=secret \
                 --version=$RANCHER_VERSION \
                 --set privateCA=$PRIVATE_CA
@@ -143,7 +143,7 @@ elif [ "$SSL_CONFIG" == "custom" ]; then
             helm install rancher rancher-$CHART_REPO_NAME/rancher \
                 --namespace $NAMESPACE \
                 --set hostname=$HOSTNAME \
-                --set bootstrapPassword=$PASSWORD \
+                --set bootstrapPassword="$PASSWORD" \
                 --set ingress.tls.source=secret \
                 --version=$RANCHER_VERSION \
                 --set privateCA=$PRIVATE_CA \
