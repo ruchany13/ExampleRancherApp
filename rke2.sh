@@ -32,9 +32,9 @@ read -p "Press Enter to continue or Ctrl+C to abort..."
 
 if [ "$INSTALL_RKE2_VERSION" == "latest" ]; then
     curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
+else
+    curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="$INSTALL_RKE2_VERSION" INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
 fi
-
-curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="$INSTALL_RKE2_VERSION" INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
 
 sudo systemctl enable rke2-server.service  
 echo -e "\nStarting RKE2 $INSTALL_RKE2_TYPE service..."  
