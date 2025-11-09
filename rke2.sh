@@ -30,7 +30,7 @@ read -p "Press Enter to continue or Ctrl+C to abort..."
 
 # Download and install RKE2
 
-if ["$INSTALL_RKE2_VERSION" == "latest"]; then
+if [ "$INSTALL_RKE2_VERSION" == "latest" ]; then
     curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
 fi
 
