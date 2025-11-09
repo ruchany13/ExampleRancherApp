@@ -36,7 +36,6 @@ else
     curl -sfL https://get.rke2.io | INSTALL_RKE2_VERSION="$INSTALL_RKE2_VERSION" INSTALL_RKE2_TYPE="$INSTALL_RKE2_TYPE" INSTALL_RKE2_CHANNEL="$INSTALL_RKE2_CHANNEL" sh -
 fi
 
-sudo systemctl enable rke2-server.service  
 echo -e "\nStarting RKE2 $INSTALL_RKE2_TYPE service..."  
 
 if [ "$INSTALL_RKE2_TYPE" == "agent" ]; then
