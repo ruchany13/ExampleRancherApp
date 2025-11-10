@@ -1,0 +1,41 @@
+- name: RKE2 Worker Node Installation
+  hosts: worker_nodes
+  become: true
+  vars:
+    rke2_version: "v1.33.4+rke2r1"
+    rke2_channel: "stable"
+    rke2_token: "{{ hostvars[groups['control_plane'][0]]['rke2_server_token'] }}"
+    control_plane_ip: "{{ groups['control_plane'][0] }}"
+
+  tasks:
+    - name: Ping worker nodes
+      ansible.builtin.ping:
+
+    - name: Create RKE2 config directory
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: '0755'
+
+    - name: Create RKE2 agent config file from template
+      ansible.builtin.template:
+        src: config.yaml.j2
+        dest: /etc/rancher/rke2/config.yaml
+        mode: '0600'
+
+    - name: Download RKE2 installation script
+      ansible.builtin.get_url:
+        url: https://get.rke2.io
+        dest: /tmp/install_rke2.sh
+        mode: '0755'
+
+    - name: Install RKE2 agent
+      ansible.builtin.command:
+        cmd: /tmp/install_rke2.sh INSTALL_RKE2_VERSION={{ rke2_version }} INSTALL_RKE2_CHANNEL={{ rke2_channel }} INSTALL_RKE2_TYPE="agent"
+        creates: /usr/local/bin/rke2
+
+    - name: Enable and start rke2-agent service
+      ansible.builtin.systemd_service:
+        name: rke2-agent
+        state: started
+        enabled: true

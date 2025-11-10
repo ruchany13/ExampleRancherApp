@@ -1,0 +1,133 @@
+---
+# RKE2 Full Cluster Setup
+
+- name: RKE2 Control Plane Installation
+  hosts: control_plane
+  become: true
+  vars:
+    rke2_version: "v1.33.4+rke2r1"
+    rke2_channel: "stable"
+
+  tasks:
+    - name: Ping control plane
+      ansible.builtin.ping:
+
+    - name: Download RKE2 installation script
+      ansible.builtin.get_url:
+        url: https://get.rke2.io
+        dest: /tmp/install_rke2.sh
+        mode: '0755'
+
+    - name: Install RKE2 server
+      ansible.builtin.command:
+        cmd: /tmp/install_rke2.sh INSTALL_RKE2_VERSION={{ rke2_version }} INSTALL_RKE2_CHANNEL={{ rke2_channel }}
+        creates: /usr/local/bin/rke2
+
+    - name: Enable and start RKE2 server service
+      ansible.builtin.systemd_service:
+        name: rke2-server
+        state: started
+        enabled: true
+
+    - name: Wait for token file to be created
+      ansible.builtin.wait_for:
+        path: /var/lib/rancher/rke2/server/token
+        state: present
+        timeout: 300
+
+    - name: Create kubectl symlink
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/kubectl
+        dest: /usr/local/bin/kubectl
+        state: link
+
+    - name: Create crictl symlink
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/crictl
+        dest: /usr/local/bin/crictl
+        state: link
+
+    - name: Create ctr symlink
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/ctr
+        dest: /usr/local/bin/ctr
+        state: link
+
+    - name: Configure kubeconfig
+      ansible.builtin.shell: |
+        mkdir -p $HOME/.kube
+        sudo cp /etc/rancher/rke2/rke2.yaml $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      args:
+        executable: /bin/bash
+
+    - name: Read RKE2 token from server
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/rke2/server/token
+      register: rke2_token_content
+
+    - name: Set token as host fact
+      ansible.builtin.set_fact:
+        rke2_server_token: "{{ rke2_token_content.content | b64decode | trim }}"
+        control_plane_ip: "{{ ansible_default_ipv4.address }}"
+        cacheable: true
+
+- name: RKE2 Worker Nodes Installation
+  hosts: worker_nodes
+  become: true
+  vars:
+    rke2_version: "v1.33.4+rke2r1"
+    rke2_channel: "stable"
+    rke2_token: "{{ hostvars[groups['control_plane'][0]]['rke2_server_token'] }}"
+    control_plane_ip: "{{ hostvars[groups['control_plane'][0]]['control_plane_ip'] }}"
+
+  tasks:
+    - name: Ping worker nodes
+      ansible.builtin.ping:
+
+    - name: Create RKE2 config directory
+      ansible.builtin.file:
+        path: /etc/rancher/rke2
+        state: directory
+        mode: '0755'
+
+    - name: Create RKE2 agent config from template
+      ansible.builtin.template:
+        src: config.yaml.j2
+        dest: /etc/rancher/rke2/config.yaml
+        mode: '0600'
+
+    - name: Download RKE2 installation script
+      ansible.builtin.get_url:
+        url: https://get.rke2.io
+        dest: /tmp/install_rke2.sh
+        mode: '0755'
+
+    - name: Install RKE2 agent
+      ansible.builtin.command:
+        cmd: /tmp/install_rke2.sh INSTALL_RKE2_VERSION={{ rke2_version }} INSTALL_RKE2_CHANNEL={{ rke2_channel }} INSTALL_RKE2_TYPE="agent"
+        creates: /usr/local/bin/rke2
+
+    - name: Enable and start rke2-agent service
+      ansible.builtin.systemd_service:
+        name: rke2-agent
+        state: started
+        enabled: true
+
+    - name: Wait for node to join cluster
+      ansible.builtin.pause:
+        seconds: 10
+
+- name: Verify Cluster Status
+  hosts: control_plane
+  become: true
+  tasks:
+    - name: Get cluster nodes
+      ansible.builtin.command:
+        cmd: /usr/local/bin/kubectl get nodes
+      register: cluster_nodes
+      changed_when: false
+
+    - name: Display cluster status
+      ansible.builtin.debug:
+        msg: "{{ cluster_nodes.stdout_lines }}"

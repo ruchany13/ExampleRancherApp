@@ -1,0 +1,63 @@
+- name: Rke2 Installation on Control Plane
+  hosts: control_plane
+  become: true
+  vars:
+    rke2_version: "v1.33.4+rke2r1"
+    rke2_channel: "stable"
+
+  tasks:
+    - name: Ping my hosts
+      ansible.builtin.ping:
+
+    - name: Rke2 Installation Script Download
+      ansible.builtin.get_url:
+        url: https://get.rke2.io
+        dest: /tmp/install_rke2.sh
+        mode: '0755'
+
+    - name: Rke2 Installation Script Run
+      ansible.builtin.command:
+        cmd: /tmp/install_rke2.sh INSTALL_RKE2_VERSION={{ rke2_version }} INSTALL_RKE2_CHANNEL {{ rke2_channel }}
+        creates: /usr/local/bin/rke2
+
+    - name: Enable and Start Rke2-server service
+      ansible.builtin.systemd_service:
+        name: rke2-server
+        state: started
+        enabled: true
+
+    - name: Kubectl Symlink Creation
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/kubectl
+        dest: /usr/local/bin/kubectl
+        state: link
+
+    - name: Crictl Symlink Creation
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/crictl
+        dest: /usr/local/bin/crictl
+        state: link
+
+    - name: Ctr Symlink Creation
+      ansible.builtin.file:
+        src: /var/lib/rancher/rke2/bin/ctr
+        dest: /usr/local/bin/ctr
+        state: link
+
+    - name: Kubeconfig Configuration on Nodes
+      ansible.builtin.shell: |
+        mkdir -p $HOME/.kube
+        sudo cp /etc/rancher/rke2/rke2.yaml $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+      args:
+        executable: /bin/bash
+
+    - name: Read RKE2 token from server
+      ansible.builtin.slurp:
+        src: /var/lib/rancher/rke2/server/token
+      register: rke2_token_content
+
+    - name: Set token as host fact
+      ansible.builtin.set_fact:
+        rke2_server_token: "{{ rke2_token_content.content | b64decode | trim }}"
+        cacheable: true
