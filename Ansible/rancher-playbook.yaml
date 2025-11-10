@@ -1,0 +1,191 @@
+---
+- name: Rancher Installation & Setup
+  hosts: control_plane[0]
+  become: true
+  vars_files:
+    - rancher_vars.yaml
+  tasks:
+    - name: Kubectl Access Check
+      ansible.builtin.command:
+        cmd: kubectl get nodes
+      register: kubectl_check
+      failed_when: kubectl_check.rc != 0
+      changed_when: false
+
+    - name: Helm Check
+      ansible.builtin.command:
+        cmd: helm version
+      register: helm_check
+      failed_when: helm_check.rc != 0
+      changed_when: false
+      ignore_errors: true
+
+    - name: Download Helm installation script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        dest: /tmp/get-helm-3.sh
+        mode: '0700'
+      when: helm_check.rc != 0
+
+    - name: Install Helm
+      ansible.builtin.command:
+        cmd: /tmp/get-helm-3.sh
+      when: helm_check.rc != 0
+      changed_when: true
+
+    - name: Remove Helm installation script
+      ansible.builtin.file:
+        path: /tmp/get-helm-3.sh
+        state: absent
+      when: helm_check.rc != 0
+
+    - name: Python pip3 Installation
+      ansible.builtin.package:
+        name: python3-pip
+        state: present
+
+    - name: Python Kubernetes Module Installation
+      ansible.builtin.pip:
+        name: 
+          - kubernetes
+          - PyYAML
+        state: present
+        break_system_packages : yes
+
+    - name: Add Rancher Helm repository
+      kubernetes.core.helm_repository:
+        name: "{{ chart_repo_name | default('stable') }}"
+        repo_url: "https://releases.rancher.com/server-charts/{{ chart_repo_name | default('stable') }}"
+
+    - name: Create Rancher Namespace
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ rancher_namespace | default('cattle-system') }}"
+        state: present
+    
+    - name: Add Jetstack Helm repository
+      kubernetes.core.helm_repository:
+        name: jetstack
+        repo_url: https://charts.jetstack.io
+
+    - name: Install Cert-manager via Helm
+      kubernetes.core.helm:
+        name: cert-manager
+        chart_ref: jetstack/cert-manager
+        release_namespace: cert-manager
+        create_namespace: true
+        values:
+          installCRDs: true
+
+    - name: Wait for Cert-manager deployment to be ready
+      kubernetes.core.k8s_info:
+        kind: Deployment
+        namespace: cert-manager
+        name: cert-manager
+      register: cert_manager_deployment
+      until: cert_manager_deployment.resources[0].status.availableReplicas | default(0) >= 1
+      retries: 10
+      delay: 15
+      when: ssl_config_type != "custom"
+
+    - name: Rancher Installation with Generated Certificates
+      kubernetes.core.helm:
+        name: rancher
+        chart_ref: "{{ chart_repo_name | default('stable') }}/rancher"
+        release_namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        create_namespace: false
+        chart_version: "{{ rancher_version | default(omit) }}"
+        values:
+          hostname: "{{ rancher_hostname }}"
+          bootstrapPassword: "{{ admin_bootstrap_password }}"
+      when: ssl_config_type == "generated"
+
+    - name: Download Let's Encrypt ISRG Root X1 cert
+      ansible.builtin.get_url:
+        url: https://letsencrypt.org/certs/isrgrootx1.pem
+        dest: /tmp/cacerts.pem
+        mode: '0644'
+      when: ssl_config_type == "lets-encrypt"
+
+    - name: Read the certificate file from remote host
+      ansible.builtin.slurp:
+        src: /tmp/cacerts.pem
+      register: cacerts_content
+      when: ssl_config_type == "lets-encrypt"
+
+    - name: Create the 'tls-ca' secret from the downloaded file
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        kind: Secret
+        api_version: v1
+        name: tls-ca
+        definition:
+          type: generic
+          data:
+            cacerts.pem: "{{ cacerts_content.content }}"
+      when: ssl_config_type == "lets-encrypt"
+
+    - name: Rancher Installation with Let's Encrypt
+      kubernetes.core.helm:
+        name: rancher
+        chart_ref: "{{ chart_repo_name | default('stable') }}/rancher"
+        release_namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        create_namespace: false
+        chart_version: "{{ rancher_version | default(omit) }}"
+        values:
+          hostname: "{{ rancher_hostname }}"
+          bootstrapPassword: "{{ admin_bootstrap_password }}"
+          ingress:
+            tls:
+              source: letsEncrypt
+          letsEncrypt:
+            email: "{{ ssl_mail }}"
+            ingress:
+              class: "{{ ingress_class }}"
+          privateCA: true
+      when: ssl_config_type == "lets-encrypt"
+
+    - name: Rancher Installation with Custom Certificates - Create TLS secret
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        kind: Secret
+        api_version: v1
+        name: tls-rancher-ingress
+        definition:
+          type: kubernetes.io/tls
+          data:
+            tls.crt: "{{ lookup('file', tls_path) | b64encode }}"
+            tls.key: "{{ lookup('file', key_path) | b64encode }}"
+      when: ssl_config_type == "custom"
+
+    - name: Rancher Installation with Custom Certificates - Create Private CA secret
+      kubernetes.core.k8s:
+        state: present
+        namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        kind: Secret
+        api_version: v1
+        name: tls-ca
+        definition:
+          type: generic
+          data:
+            cacerts.pem: "{{ lookup('file', private_ca_path) | b64encode }}"
+      when: ssl_config_type == "custom" and private_ca | default(false)
+
+    - name: Rancher Installation with Custom Certificates
+      kubernetes.core.helm:
+        name: rancher
+        chart_ref: "{{ chart_repo_name | default('stable') }}/rancher"
+        release_namespace: "{{ rancher_namespace | default('cattle-system') }}"
+        create_namespace: false
+        chart_version: "{{ rancher_version | default(omit) }}"
+        values:
+          hostname: "{{ rancher_hostname }}"
+          bootstrapPassword: "{{ admin_bootstrap_password }}"
+          ingress:
+            tls:
+              source: secret
+          privateCA: "{{ private_ca | default(false) }}"
+      when: ssl_config_type == "custom"

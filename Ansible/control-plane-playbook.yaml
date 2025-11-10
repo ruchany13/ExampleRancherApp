@@ -1,3 +1,4 @@
+---
 - name: Rke2 Installation on Control Plane
   hosts: control_plane
   become: true

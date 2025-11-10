@@ -1,0 +1,36 @@
+#---- Rancher Installation Configuration ----#
+
+# General Rancher Configuration
+# Rancher Version
+# Check kubernetes version matrix with Rancher
+rancher_version: ""
+# Rancher Repo Name, default is stable, leave empty for stable
+# Options: stable, latest, alpha
+chart_repo_name: "stable"  # Options: stable, latest, alpha
+# Rancher namespace, default cattle-system, leave empty for cattle-system
+ranher_namespace: "cattle-system"
+rancher_hostname: ""
+admin_bootstrap_password: "admin123"
+
+# SSL Configuration
+# Options: generated, lets-encrypt, custom
+ssl_config_type: "lets-encrypt"
+
+# ---- Let's Encrypt ---- #
+# Ingress Class Name, for Rke2 nginx
+ingress_class: ""
+ssl_mail: ""
+
+# ---- Custom / Certificates from Files ----- #
+# If don't choose SSL_CONFIG_TYPE="custom", skip this stepss
+
+# If you use custom CA, write True
+# Default false, leave for empty
+private_ca: false
+# If PRIVATE_CA true, edit
+# Private CA's root certificate or certificate chain on the Ansible 
+private_ca_path: ""
+# Certificate path
+tls_path: ""
+# Certificate Key path
+key_path: ""
