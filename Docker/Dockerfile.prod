@@ -6,8 +6,8 @@ WORKDIR /app
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-COPY ../parentinfo .
-COPY ../requirements.txt .
+COPY app/parentinfo .
+COPY app/requirements.txt .
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt

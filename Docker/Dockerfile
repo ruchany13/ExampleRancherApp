@@ -3,8 +3,8 @@ FROM python:3.13
 RUN mkdir /app
 WORKDIR /app
 
-COPY ../parentinfo .
-COPY ../requirements.txt .
+COPY app/parentinfo .
+COPY app/requirements.txt .
 COPY Docker/entrypoint-dev.sh .
 COPY Docker/sample_data.json .
 # Python buffers logs; this prevents that [behavior], enabling real-time monitoring of logs.

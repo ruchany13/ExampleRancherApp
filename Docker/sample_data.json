@@ -1,0 +1,313 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "username": "manager1",
+      "first_name": "John",
+      "last_name": "Smith",
+      "email": "manager1@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-09-01T10:00:00Z",
+      "password": "pbkdf2_sha256$600000$test$test"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "username": "manager2",
+      "first_name": "Michael",
+      "last_name": "Brown",
+      "email": "manager2@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-09-01T10:00:00Z",
+      "password": "pbkdf2_sha256$600000$test$test"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "username": "manager3",
+      "first_name": "David",
+      "last_name": "Wilson",
+      "email": "manager3@example.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-09-01T10:00:00Z",
+      "password": "pbkdf2_sha256$600000$test$test"
+    }
+  },
+  {
+    "model": "core.institution",
+    "pk": 1,
+    "fields": {
+      "name": "Oakwood Academy",
+      "address": "123 Main Street, Springfield, IL",
+      "location": "https://maps.google.com/?q=39.9334,32.8597",
+      "manager": 1
+    }
+  },
+  {
+    "model": "core.institution",
+    "pk": 2,
+    "fields": {
+      "name": "Maple Creek Hall",
+      "address": "456 Elm Avenue, Rivertown, TX",
+      "location": "https://maps.google.com/?q=41.0082,28.9784",
+      "manager": 2
+    }
+  },
+  {
+    "model": "core.institution",
+    "pk": 3,
+    "fields": {
+      "name": "Willow Peak School",
+      "address": "789 Pine Road, Lakeside, CA",
+      "location": "https://maps.google.com/?q=38.4192,27.1287",
+      "manager": 3
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 1,
+    "fields": {
+      "institution": 1,
+      "first_name": "James",
+      "last_name": "Johnson",
+      "grade": "5",
+      "level": "1",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 2,
+    "fields": {
+      "institution": 1,
+      "first_name": "Robert",
+      "last_name": "Williams",
+      "grade": "5",
+      "level": "2",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 3,
+    "fields": {
+      "institution": 1,
+      "first_name": "William",
+      "last_name": "Jones",
+      "grade": "6",
+      "level": "1",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 4,
+    "fields": {
+      "institution": 1,
+      "first_name": "Richard",
+      "last_name": "Miller",
+      "grade": "6",
+      "level": "2",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 5,
+    "fields": {
+      "institution": 2,
+      "first_name": "Charles",
+      "last_name": "Davis",
+      "grade": "7",
+      "level": "2",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 6,
+    "fields": {
+      "institution": 2,
+      "first_name": "Thomas",
+      "last_name": "Garcia",
+      "grade": "7",
+      "level": "3",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 7,
+    "fields": {
+      "institution": 2,
+      "first_name": "Daniel",
+      "last_name": "Rodriguez",
+      "grade": "8",
+      "level": "3",
+      "status": true
+    }
+  },
+  {
+    "model": "core.student",
+    "pk": 8,
+    "fields": {
+      "institution": 3,
+      "first_name": "Matthew",
+      "last_name": "Martinez",
+      "grade": "8",
+      "level": "2",
+      "status": true
+    }
+  },
+  {
+    "model": "activity.gradereport",
+    "pk": 1,
+    "fields": {
+      "grade": "5",
+      "institution": 1,
+      "description": "5th-grade students worked on a group science project. Focused on building a model volcano and presenting findings.",
+      "time": "2025-09-25"
+    }
+  },
+  {
+    "model": "activity.gradereport",
+    "pk": 2,
+    "fields": {
+      "grade": "6",
+      "institution": 1,
+      "description": "6th-grade students participated in a history debate. The topic was 'The Impact of the Industrial Revolution'.",
+      "time": "2025-09-26"
+    }
+  },
+  {
+    "model": "activity.gradereport",
+    "pk": 3,
+    "fields": {
+      "grade": "7",
+      "institution": 2,
+      "description": "7th-grade students began their algebra module. Focused on solving linear equations and word problems.",
+      "time": "2025-09-27"
+    }
+  },
+  {
+    "model": "activity.gradereport",
+    "pk": 4,
+    "fields": {
+      "grade": "8",
+      "institution": 2,
+      "description": "8th-grade students attended a writing workshop. Practiced peer-review and descriptive essay techniques.",
+      "time": "2025-09-28"
+    }
+  },
+  {
+    "model": "activity.levelreport",
+    "pk": 1,
+    "fields": {
+      "level": "1",
+      "institution": 1,
+      "description": "Level 1 students participated in an after-school soccer game. The blue team won 3-1.",
+      "time": "2025-09-25"
+    }
+  },
+  {
+    "model": "activity.levelreport",
+    "pk": 2,
+    "fields": {
+      "level": "2",
+      "institution": 1,
+      "description": "Level 2 students attended a guest seminar on 'Career Day'. Speakers from tech and art fields were present.",
+      "time": "2025-09-26"
+    }
+  },
+  {
+    "model": "activity.levelreport",
+    "pk": 3,
+    "fields": {
+      "level": "2",
+      "institution": 2,
+      "description": "Level 2 students joined the new coding club. They started learning basic Python syntax and logic.",
+      "time": "2025-09-27"
+    }
+  },
+  {
+    "model": "activity.levelreport",
+    "pk": 4,
+    "fields": {
+      "level": "3",
+      "institution": 2,
+      "description": "Level 3 students organized a charity bake sale. Raised $250 for the local community center.",
+      "time": "2025-09-28"
+    }
+  },
+  {
+    "model": "activity.tracking",
+    "pk": 1,
+    "fields": {
+      "student": 1,
+      "iso_year": 2025,
+      "iso_week": 39
+    }
+  },
+  {
+    "model": "activity.tracking",
+    "pk": 2,
+    "fields": {
+      "student": 2,
+      "iso_year": 2025,
+      "iso_week": 39
+    }
+  },
+  {
+    "model": "activity.tracking",
+    "pk": 3,
+    "fields": {
+      "student": 3,
+      "iso_year": 2025,
+      "iso_week": 39
+    }
+  },
+  {
+    "model": "announcement.generalnotice",
+    "pk": 1,
+    "fields": {
+      "name": "Annual School Trip",
+      "notice": "This year's annual school trip will be to the National History Museum. All students are expected to join.",
+      "time": "2025-09-20"
+    }
+  },
+  {
+    "model": "announcement.generalnotice",
+    "pk": 2,
+    "fields": {
+      "name": "Robotics Workshop",
+      "notice": "Sign-ups for the new robotics workshop are now open. Please contact the science department for more details.",
+      "time": "2025-09-22"
+    }
+  },
+  {
+    "model": "announcement.institutionnotice",
+    "pk": 1,
+    "fields": {
+      "name": 1,
+      "institution": 1,
+      "instutionnotice": "Oakwood Academy Trip Details:\n- Departure: 08:00 AM\n- Arrival: 09:30 AM\n- Lunch: 12:30 PM\n- Return: 04:00 PM"
+    }
+  },
+  {
+    "model": "announcement.institutionnotice",
+    "pk": 2,
+    "fields": {
+      "name": 2,
+      "institution": 2,
+      "instutionnotice": "Maple Creek Hall Robotics Workshop Details:\n- Daily meeting: 2:00 PM\n- Team projects start next week\n- Final competition in one month\n- Regular updates for parents."
+    }
+  }
+]
