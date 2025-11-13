@@ -80,50 +80,61 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'parentinfo.wsgi.application'
 
-# -------- Cloudflare R2 for static and media files -------------- #
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
-AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")  # https://<account_id>.r2.cloudflarestorage.com
-AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto")
-AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
+# -------- Storage Configuration (Local or Cloud) -------------- #
+STORAGE_TYPE = os.getenv("STORAGE_TYPE", "local").lower()
 
-# Special parameters For Cloudflare R2
-AWS_S3_ADDRESSING_STYLE = "virtual"      
-AWS_DEFAULT_ACL = None                    
-AWS_S3_SIGNATURE_VERSION = "s3v4"
-AWS_QUERYSTRING_AUTH = False            
+if STORAGE_TYPE == "cloud":
+    # -------- Cloudflare R2 for static and media files -------------- #
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")  # https://<account_id>.r2.cloudflarestorage.com
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto")
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
 
-# Stream for big files
-#AWS_S3_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+    # Special parameters For Cloudflare R2
+    AWS_S3_ADDRESSING_STYLE = "virtual"      
+    AWS_DEFAULT_ACL = None                    
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_QUERYSTRING_AUTH = False            
 
-# Optional: sensible default object parameters (cache headers) for static/media
-AWS_S3_OBJECT_PARAMETERS = {
-    "CacheControl": "max-age=86400, must-revalidate",
-}
+    # Stream for big files
+    #AWS_S3_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
-# NOTE: We keep storage classes in a separate module to avoid importing boto3
-# (and django-storages) at settings-import time which can break some manage.py
-# commands in environments where those packages are not installed.
-STORAGES = {
-    "default": {
-        "BACKEND": "parentinfo.storages.MediaStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "parentinfo.storages.StaticStorage",
-    },
-}
+    # Optional: sensible default object parameters (cache headers) for static/media
+    AWS_S3_OBJECT_PARAMETERS = {
+        "CacheControl": "max-age=86400, must-revalidate",
+    }
 
-# Build STATIC_URL / MEDIA_URL safely: prefer a custom domain, fall back to the
-# R2 endpoint, and finally to local paths if neither is provided.
-STATIC_DOMAIN = AWS_S3_CUSTOM_DOMAIN or AWS_S3_ENDPOINT_URL
-if STATIC_DOMAIN:
-    STATIC_DOMAIN = STATIC_DOMAIN.rstrip('/')
-    STATIC_URL = f"https://{STATIC_DOMAIN}/static/"
-    MEDIA_URL = f"https://{STATIC_DOMAIN}/media/"
+    # NOTE: We keep storage classes in a separate module to avoid importing boto3
+    # (and django-storages) at settings-import time which can break some manage.py
+    # commands in environments where those packages are not installed.
+    STORAGES = {
+        "default": {
+            "BACKEND": "parentinfo.storages.MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "parentinfo.storages.StaticStorage",
+        },
+    }
+
+    # Build STATIC_URL / MEDIA_URL safely: prefer a custom domain, fall back to the
+    # R2 endpoint, and finally to local paths if neither is provided.
+    STATIC_DOMAIN = AWS_S3_CUSTOM_DOMAIN or AWS_S3_ENDPOINT_URL
+    if STATIC_DOMAIN:
+        STATIC_DOMAIN = STATIC_DOMAIN.rstrip('/')
+        STATIC_URL = f"https://{STATIC_DOMAIN}/static/"
+        MEDIA_URL = f"https://{STATIC_DOMAIN}/media/"
+    else:
+        STATIC_URL = "/static/"
+        MEDIA_URL = "/media/"
 else:
+    # -------- Local Storage Configuration -------------- #
     STATIC_URL = "/static/"
+    STATIC_ROOT = BASE_DIR / "staticfiles"
+    
     MEDIA_URL = "/media/"
+    MEDIA_ROOT = BASE_DIR / "media"
 
 # ---------- Database Configuration for PostgreSQL -------------- #
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
