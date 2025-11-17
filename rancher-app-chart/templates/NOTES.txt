@@ -1,6 +1,17 @@
 Successfuly deployed Rancher App Chart!
+
 1. Accessing the Application:
+{{- if .Values.ingress.enabled }}
+   Your application is accessible via Ingress:
+   {{- range .Values.ingress.hosts }}
+   {{- if $.Values.ingress.tls.enabled }}
+   https://{{ .host }}
+   {{- else }}
+   http://{{ .host }}
+   {{- end }}
+   {{- end }}
+{{- else }}
    Once the deployment is complete, you can access your application using the following URL:
     http://<your-domain-or-ip>:<port> 
-    Replace <your-domain-or-ip> and <port> with the appropriate values for your setup.          
-    
+    Replace <your-domain-or-ip> and <port> with the appropriate values for your setup.
+{{- end }}
