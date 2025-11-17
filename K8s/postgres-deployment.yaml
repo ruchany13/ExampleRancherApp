@@ -18,7 +18,7 @@ spec:
           image: postgres:16
           envFrom:
             - secretRef:
-                name: django-secret
+                name: postgres-secret
           ports:
             - containerPort: 5432
           volumeMounts:
