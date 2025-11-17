@@ -8,6 +8,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 COPY app/parentinfo .
 COPY app/requirements.txt .
+COPY ./entrypoint.sh .
 
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
