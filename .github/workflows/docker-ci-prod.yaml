@@ -6,7 +6,7 @@ on:
     paths:
     - "app/*"
     - "Docker/*"
-    - ".github/workflows/*"
+    - ".github/workflows/docker-ci-prod.yaml"
     tags:      
       - '*'
   pull_request:
