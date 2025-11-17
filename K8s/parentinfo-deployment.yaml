@@ -37,3 +37,10 @@ spec:
         - name: media-volume
           persistentVolumeClaim:
             claimName: media-pvc-parentinfo
+          resources:
+            requests:
+              cpu: "250m"     
+              memory: "256Mi" 
+            limits:
+              cpu: "1"
+              memory: "1Gi"
