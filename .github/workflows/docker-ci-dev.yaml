@@ -37,12 +37,15 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Push the Docker image version
+    - name: Tag Docker Image with latest
+      run: docker tag $IMAGE_NAME:$IMAGE_TAG $IMAGE_NAME
+    
+    - name: Push the Docker image
       run: docker push $IMAGE_NAME:$IMAGE_TAG
     
-    - name: Push the latest 
-      run: docker push $IMAGE_NAME:latest
-    
+    - name: Push the latest
+      run: docker push $IMAGE_NAME
+
     - name: Output image details
       run: |
         echo "Docker Image: $IMAGE_NAME:$IMAGE_TAG" 
