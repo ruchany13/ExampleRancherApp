@@ -1,11 +1,11 @@
-name: Helm Package CI - Dev
+name: Helm Package CI
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: [ "main" ]
     paths:
     - "rancher-app-chart/*"
-    - ".github/workflows/*"
+    - ".github/workflows/helm-ci.yaml"
 jobs:
 
   build-and-push-helm-chart:
@@ -13,7 +13,6 @@ jobs:
 
     env:
         CHART_NAME: rancher-app-chart
-    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
