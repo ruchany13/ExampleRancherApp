@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-        CHART_NAME: helm-parentinfo
+        CHART_NAME: rancher-app-chart
     
     steps:
     - name: Checkout repository
