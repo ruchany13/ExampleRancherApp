@@ -2,7 +2,7 @@ namespace: parentinfo
 
 image:
   repository: ruchany13/parentinfo
-  tag: 0.1
+  tag: latest
 
 # Storage configuration: "local" or "cloud"
 storageType: local
