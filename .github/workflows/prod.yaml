@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_NAME: ghcr.io/ruchany13/parentinfo
+      IMAGE_NAME: ghcr.io/ruchany13/parentinfo-prod
 
     steps:
     - name: Checkout repository
