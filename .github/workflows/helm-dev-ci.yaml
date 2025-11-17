@@ -30,4 +30,4 @@ jobs:
     
     - name: Push Helm Chart to GitHub Container Registry
       run: |
-        helm push ./charts/${CHART_NAME}-0.1.0.tgz oci://ghcr.io/ruchany13/helm-charts
+        helm push ./charts/* oci://ghcr.io/ruchany13/helm-charts
