@@ -6,7 +6,7 @@ on:
     paths:
     - "app/*"
     - "Docker/*"
-    - ".github/*"
+    - ".github/workflows/*"
     tags:      
       - '*'
   pull_request:
