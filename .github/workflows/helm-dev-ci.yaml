@@ -1,4 +1,4 @@
-name: Helm CI - Dev
+name: Helm Package CI - Dev
 
 on:
   push:
