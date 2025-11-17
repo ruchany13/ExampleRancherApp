@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Student Search</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --surface:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0ea5e9;
+      --accent:#8b5cf6;
+      --ring:rgba(14,165,233,.25);
+      --chip:#eef2ff;
+      --success:#16a34a;
+      --danger:#ef4444;
+      --shadow:0 8px 24px rgba(2,6,23,.08);
+      --radius:16px;
+      --radius-lg:20px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f172a; --surface:#0b1220; --card:#111827; --text:#e5e7eb; --muted:#9ca3af;
+        --border:#1f2937; --primary:#22d3ee; --accent:#a78bfa; --ring:rgba(34,211,238,.35);
+        --chip:#1f2230; --success:#34d399; --danger:#f87171; --shadow:0 12px 36px rgba(0,0,0,.35);
+      }
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 480px at 110% -20%, rgba(139,92,246,.10), transparent 60%),
+        radial-gradient(800px 420px at -10% 0%, rgba(14,165,233,.10), transparent 60%),
+        var(--bg);
+      display:flex; align-items:center; justify-content:center; padding:24px;
+    }
+
+    .container{ width:100%; max-width:720px }
+    .card{
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius-lg); padding:24px; box-shadow:var(--shadow);
+    }
+
+    .title{
+      margin:0 0 8px; font-size:clamp(22px,3.2vw,30px); font-weight:800; letter-spacing:.2px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .pill{
+      font-size:12px; padding:6px 10px; border-radius:999px; color:#061118;
+      background:linear-gradient(90deg,var(--primary),var(--accent)); font-weight:800;
+      box-shadow:0 8px 24px rgba(14,165,233,.25);
+    }
+    .subtitle{margin:0 0 18px; color:var(--muted)}
+
+    form{display:grid; grid-template-columns:1fr; gap:14px}
+    @media(min-width:640px){ form{ grid-template-columns:1fr 1fr auto; align-items:end } }
+
+    .field{ display:flex; flex-direction:column }
+    label{ font-size:14px; margin-bottom:6px; color:var(--muted) }
+
+    input[type="text"]{
+      width:100%; padding:12px 14px; border-radius:12px; border:1px solid var(--border);
+      background:#ffffff; color:var(--text); outline:none; transition:.2s border-color,.2s box-shadow,.2s transform;
+    }
+    @media (prefers-color-scheme: dark){
+      input[type="text"]{ background:rgba(255,255,255,.06) }
+      input[type="text"]::placeholder{ color:rgba(255,255,255,.45) }
+    }
+    input[type="text"]::placeholder{ color:#94a3b8 }
+    input[type="text"]:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 6px var(--ring);
+      transform:translateY(-1px);
+    }
+
+    .hint{ margin:6px 0 0; color:var(--muted); font-size:12px }
+
+    .btn{
+      padding:12px 18px; border:none; border-radius:12px; cursor:pointer; font-weight:800;
+      background:linear-gradient(90deg,var(--primary),var(--accent));
+      color:#061118; transition:.2s transform,.2s filter; white-space:nowrap;
+      box-shadow:0 8px 24px rgba(14,165,233,.25);
+    }
+    .btn:hover{ transform:translateY(-1px) }
+    .btn:active{ transform:translateY(0) scale(.98) }
+
+    .msg{
+      margin-top:14px; padding:12px 14px; border-radius:12px; font-size:14px; line-height:1.45;
+      background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.35); color:var(--danger);
+    }
+
+    .footer{
+      margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; color:var(--muted); font-size:13px;
+    }
+    a.link{ color:var(--primary); text-decoration:none; font-weight:700 }
+    a.link:hover{ text-decoration:underline }
+
+
+    :where(a,button,[tabindex],input,select,textarea):focus{
+      outline:none;
+      box-shadow:0 0 0 6px var(--ring);
+      border-radius:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="card" aria-labelledby="page-title">
+      <h1 id="page-title" class="title">Search Student</h1>
+      <p class="subtitle">Please enter the full first name and last name of the student you are the guardian of.</p>
+
+      <form method="get" aria-describedby="form-hint">
+        <div class="field">
+          <label for="id_firstname">First Name</label>
+          {{ form.name }}
+          <p class="hint">Example: <em>Ruchan</em></p>
+        </div>
+        <div class="field">
+          <label for="id_lastname">Last Name</label>
+          {{ form.surname }}
+          <p class="hint">Örn: <em>Yalcin</em></p>
+        </div>
+        <button class="btn" type="submit" aria-label="Search student">Search</button>
+      </form>
+    </section>
+
+    {% if error_message %}
+      <div class="msg" role="alert">{{ error_message }}</div>
+    {% endif %}
+  </div>
+</body>
+</html>

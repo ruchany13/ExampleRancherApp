@@ -1,0 +1,166 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<div class="content">
+  <div class="container-fluid">
+
+
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Student Count per Institution</h3></div>
+          <div class="card-body">
+            <canvas id="chartInstitution"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Student Academic Class Distribution</h3></div>
+          <div class="card-body">
+            <canvas id="chartGrade"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Student Social Activity Level Distribution</h3></div>
+          <div class="card-body">
+            <canvas id="chartLevel"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Active / Inactive Student</h3></div>
+          <div class="card-body">
+            <canvas id="chartStatus"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-7">
+        <div class="card">
+          <div class="card-header"><h3 class="card-title">Gender Distribution by Institution</h3></div>
+          <div class="card-body">
+            <canvas id="chartInstitutionGender"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // Backend context
+  const dataInstitution = {{ data_points_institution|safe }};
+  const dataGrade = {{ data_points_grade|safe }};
+  const dataLevel = {{ data_points_level|safe }};
+  const dataStatus = {{ data_points_status |safe }};
+  const dataInstitutionGender = {{ data_points_institution_gender|safe }};
+
+  // Helper: labels & data
+  const toLD = (arr) => ({
+    labels: arr.map(d => d.label),
+    values: arr.map(d => d.y)
+  });
+
+  // 1) Student Count per Institution (Bar)
+  (function(){
+    const {labels, values} = toLD(dataInstitution);
+    const ctx = document.getElementById('chartInstitution');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Öğrenci', data: values }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  })();
+
+  // 2) Student Academic Class Distribution (Pie)
+  (function(){
+    const {labels, values} = toLD(dataGrade);
+    const ctx = document.getElementById('chartGrade');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{ data: values }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  })();
+
+  // 3) Student Social Activity Level Distribution (Doughnut)
+  (function(){
+    const {labels, values} = toLD(dataLevel);
+    const ctx = document.getElementById('chartLevel');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{ data: values }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '55%'
+      }
+    });
+  })();
+
+  // 4) Active / Inactive Student (Pie)
+  (function(){
+    const {labels, values} = toLD(dataStatus);
+    const ctx = document.getElementById('chartStatus');
+    new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{ data: values }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  })();
+
+  // 5) Gender Distribution by Institution (Bar)
+  (function(){
+    const {labels, values} = toLD(dataInstitutionGenders);
+    const ctx = document.getElementById('chartInstitutionGender');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{ label: 'Kurum Sayısı', data: values }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+  })();
+</script>
+{% endblock %}

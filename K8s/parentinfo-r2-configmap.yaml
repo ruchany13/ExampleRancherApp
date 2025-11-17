@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: parentinfo-r2-secret
+  namespace: parentinfo
+type: Opaque
+stringData:
+  AWS_ACCESS_KEY_ID: "your-r2-access-key-id"
+  AWS_S3_CUSTOM_DOMAIN: "your-r2-custom-domain"
+  AWS_S3_ENDPOINT_URL: "your-r2-endpoint-url"
+  AWS_S3_REGION_NAME: "your-r2-region-name"
+  AWS_SECRET_ACCESS_KEY: "your-r2-secret-access-key"
+  AWS_STORAGE_BUCKET_NAME: "your-r2-storage-bucket-name" 

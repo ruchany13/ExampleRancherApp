@@ -1,0 +1,68 @@
+namespace: parentinfo
+
+image:
+  repository: ruchany13/parentinfo
+  tag: 0.1
+
+# Storage configuration: "local" or "cloud"
+storageType: local
+
+# Django application configuration
+django:
+  secret:
+    debug: "False"
+    allowedHosts: "parentinfo.com,www.parentinfo.com,localhost"
+    csrfTrustedOrigins: "https://parentinfo.com,https://www.parentinfo.com"
+    secretKey: "your-very-secure-and-random-secret-key"
+
+# PostgreSQL configuration
+postgres:
+  image: postgres:16
+  secret:
+    database: "mydb"
+    user: "myuser"
+    password: "password"
+  storage:
+    size: 8Gi
+    storageClassName: longhorn
+
+# Local storage configuration (when storageType: local)
+localStorage:
+  static:
+    size: 5Gi
+    storageClassName: longhorn
+  media:
+    size: 10Gi
+    storageClassName: longhorn
+
+# R2/Cloud storage configuration (when storageType: cloud)
+r2:
+  accessKeyId: "your-r2-access-key-id"
+  secretAccessKey: "your-r2-secret-access-key"
+  bucketName: "your-r2-storage-bucket-name"
+  endpointUrl: "your-r2-endpoint-url"
+  customDomain: "your-r2-custom-domain"
+  regionName: "your-r2-region-name"
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# HPA configuration
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 10
+  cpuUtilization: 80
+  memoryUtilization: 80
+
+# Resource limits
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1"
+    memory: "1Gi"

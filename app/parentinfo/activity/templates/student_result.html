@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Search Result</title>
+  <style>
+    :root{
+      --bg:#f6f8fb;
+      --surface:#ffffff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0ea5e9;
+      --accent:#8b5cf6;
+      --ring:rgba(14,165,233,.25);
+      --chip:#eef2ff;
+      --success:#16a34a;
+      --shadow:0 8px 24px rgba(2,6,23,.08);
+      --radius:16px;
+      --radius-lg:20px;
+    }
+    @media (prefers-color-scheme: dark){
+      :root{
+        --bg:#0f172a;
+        --surface:#0b1220;
+        --card:#111827;
+        --text:#e5e7eb;
+        --muted:#9ca3af;
+        --border:#1f2937;
+        --primary:#22d3ee;
+        --accent:#a78bfa;
+        --ring:rgba(34,211,238,.35);
+        --chip:#1f2230;
+        --success:#34d399;
+        --shadow:0 12px 36px rgba(0,0,0,.35);
+      }
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(900px 480px at 110% -20%, rgba(139,92,246,.10), transparent 60%),
+        radial-gradient(800px 420px at -10% 0%, rgba(14,165,233,.10), transparent 60%),
+        var(--bg);
+      min-height:100vh;
+      padding:24px;
+      display:flex; align-items:center; justify-content:center;
+    }
+
+    .container{ width:100%; max-width:960px }
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius-lg);
+      padding:24px;
+      box-shadow:var(--shadow);
+    }
+
+    .header{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px }
+    @media (min-width:640px){
+      .header{ flex-direction:row; align-items:center; justify-content:space-between }
+    }
+    .title{ margin:0; font-weight:800; font-size:clamp(22px,3.2vw,30px); letter-spacing:.2px }
+    .badge{
+      padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800;
+      color:#061118; background:linear-gradient(90deg,var(--primary),var(--accent));
+      box-shadow:0 8px 24px rgba(14,165,233,.25); margin-left:8px;
+    }
+    .chips{ display:flex; gap:8px; flex-wrap:wrap }
+    .chip{
+      padding:8px 12px; border-radius:999px; background:var(--chip);
+      border:1px solid var(--border); font-weight:700;
+    }
+
+
+    .grid{ display:grid; gap:16px; grid-template-columns:1fr }
+    @media (min-width:800px){ .grid{ grid-template-columns:1fr 1fr } }
+
+    .panel{
+      background:var(--surface);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px 16px 14px;
+      transition:.2s transform,.2s box-shadow;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .panel:hover{ transform:translateY(-2px); box-shadow:0 14px 30px rgba(2,6,23,.10) }
+
+    .lbl{ font-size:12px; letter-spacing:.4px; text-transform:uppercase; color:var(--muted); margin:0 0 6px }
+    .val{ margin:0 0 10px; font-size:16px; font-weight:700 }
+
+
+    .desc{
+      margin:0; font-size:14px; line-height:1.5; color:var(--muted);
+      background:transparent;
+      padding:0;
+    }
+
+    .back{
+      display:inline-flex; align-items:center; gap:8px; margin-top:18px; text-decoration:none; font-weight:800;
+      color:#061118; background:linear-gradient(90deg,var(--primary),var(--accent));
+      padding:10px 14px; border-radius:12px; box-shadow:0 8px 24px rgba(14,165,233,.25);
+      transition:.2s transform;
+    }
+    .back:hover{ transform:translateY(-1px) }
+
+    :where(a,button,[tabindex],input,select,textarea):focus{
+      outline:none;
+      box-shadow:0 0 0 6px var(--ring);
+      border-radius:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <article class="card" aria-labelledby="page-title">
+      <header class="header">
+        <h1 id="page-title" class="title">
+          {{ student.first_name }} {{ student.last_name }}
+          <span class="badge" aria-label="Found in search">Student</span>
+        </h1>
+      </header>
+
+      <section class="grid" aria-label="Overview">
+        <div class="panel">
+          <p class="lbl">Student Academic Grade</p>
+          <p class="val">{{ student.grade }}</p>
+          <p class="lbl">This week's academic activities</p>
+          <p class="desc">{{ grade.description }}</p>
+        </div>
+        
+        <div class="panel">
+          <p class="lbl">Student Social Activity Level </p>
+          <p class="val">{{ student.level }}</p>
+          {% if level.image %}
+            <img src="{{ level.image.url }}" alt="{{ student.level }}" style="max-width: 100%; height: auto;">
+          {% endif %}
+          <p class="lbl">This week's social activities</p>
+          <p class="desc">{{ level.description }}</p>
+        </div>
+
+
+        {% if generalNotice %}
+        <div class="panel" style="grid-column: span 2;">
+            <ul class="desc" style="list-style-type: disc; padding-left: 20px;">
+                <li>{{ generalNotice.0.notice }}</li>
+                <li> <strong>Date: </strong><em>{{ generalNotice.0.time|date:"d M Y" }}</em></li>
+                <li><strong>Program: <br></strong> {{ institutionNotice.0.get_message_as_html|safe }}</li>
+                <li><strong>Instution Address: </strong><em>{{ student.institution.address }}</em></li>>
+                <li>
+                  <strong>Instution Location: </strong>
+                  <a href="{{ student.institution.location }}" target="_blank" rel="noopener" style="color:#38bdf8;">
+                    {{ student.institution.location }}
+                  </a>
+                </li>
+
+            </ul>
+        </div>
+        {% endif %}
+    
+      </section>
+
+      <footer>
+        <a class="back" href="{% url 'search_student' %}" aria-label="Return to search page">⟵ new search</a>
+      </footer>
+    </article>
+  </div>
+</body>
+</html>

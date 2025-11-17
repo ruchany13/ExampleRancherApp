@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parentinfo
+  template:
+    metadata:
+      labels:
+        app: parentinfo
+    spec:
+      containers:
+        - name: django
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          envFrom:
+            - secretRef:
+                name: parentinfo-secret
+            - secretRef:
+                name: postgres-secret
+{{- if eq .Values.storageType "cloud" }}
+            - secretRef:
+                name: parentinfo-r2-secret
+{{- end }}
+          ports:
+            - containerPort: 8000
+{{- if eq .Values.storageType "local" }}
+          volumeMounts:
+            - name: static-volume
+              mountPath: /app/static
+            - name: media-volume
+              mountPath: /app/media
+{{- end }}
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu | quote }}
+              memory: {{ .Values.resources.requests.memory | quote }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu | quote }}
+              memory: {{ .Values.resources.limits.memory | quote }}
+{{- if eq .Values.storageType "local" }}
+      volumes:
+        - name: static-volume
+          persistentVolumeClaim:
+            claimName: static-pvc-parentinfo
+        - name: media-volume
+          persistentVolumeClaim:
+            claimName: media-pvc-parentinfo
+{{- end }}
