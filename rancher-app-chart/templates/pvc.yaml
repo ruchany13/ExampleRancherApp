@@ -1,0 +1,28 @@
+{{- if eq .Values.storageType "local" }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: static-pvc-parentinfo
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.localStorage.static.size }}
+  storageClassName: {{ .Values.localStorage.static.storageClassName }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-pvc-parentinfo
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.localStorage.media.size }}
+  storageClassName: {{ .Values.localStorage.media.storageClassName }}
+{{- end }}
