@@ -50,6 +50,24 @@ service:
   port: 80
   targetPort: 8000
 
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"  # nginx, traefik, etc.
+  annotations: {}
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  hosts:
+    - host: parentinfo.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    enabled: false
+    # - secretName: parentinfo-tls
+    #   hosts:
+    #     - parentinfo.com
+
 # HPA configuration
 hpa:
   enabled: true

@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
     paths:
     - "rancher-app-chart/*"
+    - "rancher-app-chart/templates*"
     - ".github/workflows/helm-ci.yaml"
 jobs:
 
